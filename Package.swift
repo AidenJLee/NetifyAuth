@@ -13,7 +13,7 @@ let package = Package(
             targets: ["NetifyAuth"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/AidenJLee/Netify.git", from: "2.0.2"),
+        .package(url: "https://github.com/AidenJLee/Netify.git", from: "1.0.0"),
     ],
     targets: [
         .target(
