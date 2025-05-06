@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager
+/.build
+/Packages
+/*.xcodeproj
+*.xcworkspace
+
+# Xcode User Data
+xcuserdata/
+DerivedData/
+
+# Swift PM Cache/State
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# Credentials
+.netrc
+
+# Test Coverage Files
+*.profraw
+*.profdata
+
+# VSCode
+.vscode/

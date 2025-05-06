@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "netify",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AidenJLee/Netify.git",
+      "state" : {
+        "revision" : "79c5c0fe1923923d38740279bac55de98e2d70f4",
+        "version" : "2.0.2"
+      }
+    }
+  ],
+  "version" : 2
+}
