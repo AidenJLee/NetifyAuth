@@ -57,6 +57,8 @@ targets: [
         ]
     )
 ]
+```
+
 💡 핵심 개념
 NetifyAuth를 효과적으로 사용하기 위해 다음 구성 요소들을 이해하는 것이 중요합니다.
 
@@ -71,13 +73,14 @@ refreshRequestProvider: 현재 유효한 Refresh Token 문자열을 인자로 �
 revokeRequestProvider: 현재 유효한 Refresh Token 문자열을 인자로 받아, 토큰 폐기 API를 호출하는 NetifyRequest 객체를 생성하여 반환합니다. 서버 응답 본문이 없다면 Netify.EmptyResponse를 ReturnType으로 사용할 수 있습니다.
 TokenAuthProvider (Class): Netify의 AuthenticationProvider 프로토콜을 구현한 클래스입니다. TokenManager를 사용하여 자동으로 API 요청 헤더에 유효한 Access Token을 추가하고, 토큰 만료 시(401 Unauthorized 등) TokenManager를 통해 토큰 갱신을 시도합니다.
 TokenError (Enum): 토큰 관리 과정에서 발생할 수 있는 다양한 오류 상황(예: tokenNotFound, refreshTokenMissing, refreshFailed)을 정의합니다.
+
 🚀 사용 방법
 NetifyAuth를 사용하여 앱의 인증 시스템을 구축하는 단계별 가이드입니다.
 
 1. API 요청/응답 모델 정의
 먼저, 여러분의 서버 API 명세에 맞게 Netify의 NetifyRequest 프로토콜을 따르는 요청 모델과 Codable을 따르는 응답 모델을 정의합니다. 특히 토큰 갱신 응답 모델은 TokenRefreshResponse 프로토콜을 반드시 준수해야 합니다.
 
-swift
+```swift
 import Netify
 import NetifyAuth // TokenRefreshResponse 프로토콜 사용
 
@@ -153,10 +156,12 @@ struct UserProfile: Codable { // 서버 응답 구조에 맞게 정의
     let name: String
     let email: String
 }
+```
+
 2. 설정 (Setup)
 앱의 인증 흐름을 중앙에서 관리할 객체(예: ApiClientManager 싱글톤 또는 DI 컨테이너로 관리되는 객체)에서 NetifyAuth 관련 컴포넌트들을 설정하고 초기화합니다.
 
-swift
+```swift
 import Netify
 import NetifyAuth
 import OSLog
@@ -268,10 +273,12 @@ class ApiClientManager: ObservableObject {
 
     // ... 로그인, 로그아웃 함수는 아래에 추가 ...
 }
+```
+
 3. 로그인 처리
 로그인 API 호출이 성공하면, 서버로부터 받은 토큰 정보를 TokenManager에 저장합니다. TokenManager는 내부적으로 토큰을 저장소에 저장하고, tokenStream을 통해 상태 변경을 알립니다. ApiClientManager의 구독 로직은 이 변경을 감지하여 apiClient를 설정할 것입니다.
 
-swift
+```swift
 // ApiClientManager 내부에 추가
 extension ApiClientManager {
     func performLogin(credentials: LoginCredentials) async {
@@ -300,10 +307,12 @@ extension ApiClientManager {
         }
     }
 }
+```
+
 4. 인증된 API 요청하기
 이제 ApiClientManager에 설정된 apiClient를 사용하여 인증이 필요한 API를 호출합니다. TokenAuthProvider가 자동으로 요청 헤더에 Authorization: Bearer <access_token>을 추가합니다. 만약 요청 중 401 Unauthorized 오류가 발생하면, TokenAuthProvider는 자동으로 TokenManager를 통해 토큰 갱신을 시도하고, 성공하면 원래 요청을 재시도합니다.
 
-swift
+```swift
 // SwiftUI View 예시
 struct ProfileView: View {
     @State private var profile: UserProfile?
@@ -365,10 +374,12 @@ struct ProfileView: View {
         }
     }
 }
+```
+
 5. 로그아웃 처리
 로그아웃 시에는 TokenManager의 revokeTokens()를 호출하여 서버에 토큰 폐기를 요청하고 로컬 저장소에서도 토큰을 삭제하는 것이 가장 이상적입니다. revokeTokens()는 내부적으로 clearTokens()를 호출하여 로컬 토큰을 삭제하고 tokenStream에 nil을 방출합니다.
 
-swift
+```swift
 // ApiClientManager 내부에 추가
 extension ApiClientManager {
     func performLogout() async {
@@ -413,6 +424,8 @@ struct ContentView: View {
         }
     }
 }
+```
+
 🔧 커스터마이징
 토큰 저장소: TokenStorage 프로토콜을 직접 구현하여 UserDefaults, CoreData, Realm 등 원하는 방식으로 토큰을 저장할 수 있습니다.
 Request Providers: TokenManager 초기화 시 제공하는 refreshRequestProvider 및 revokeRequestProvider 클로저를 통해 어떤 형태의 API 요청이든 생성 가능합니다.
