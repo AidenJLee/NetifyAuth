@@ -45,7 +45,7 @@ Swift Package Manager를 사용하여 NetifyAuth를 프로젝트에 쉽게 추�
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/AidenJLee/Netify.git", from: "2.0.0"), // 사용하는 Netify 버전 명시
+    .package(url: "https://github.com/AidenJLee/Netify.git", from: "1.0.0"), // 사용하는 Netify 버전 명시
     .package(url: "https://github.com/AidenJLee/NetifyAuth.git", from: "1.0.0") // 사용하는 NetifyAuth 버전 명시
 ],
 targets: [
