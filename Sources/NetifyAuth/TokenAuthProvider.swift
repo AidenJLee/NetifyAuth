@@ -8,11 +8,11 @@ import OSLog
 /// 이 Provider를 `NetifyClient` 설정 시 사용하면 인증 관련 로직을 간편하게 적용할 수 있습니다.
 @available(iOS 15, macOS 12, *)
 public final class TokenAuthProvider: AuthenticationProvider {
-
+    
     // MARK: - 타입 정의
     
     /// 인증 실패 시 동작을 위한 클로저 타입
-    public typealias AuthenticationFailedHandler = () -> Void
+    public typealias AuthenticationFailedHandler = @Sendable () -> Void
     
     // MARK: - 속성
     
@@ -47,7 +47,7 @@ public final class TokenAuthProvider: AuthenticationProvider {
         headerName: String = "Authorization",
         tokenPrefix: String = "Bearer ",
         onAuthenticationFailed: AuthenticationFailedHandler? = nil,
-        subsystem: String = Bundle.main.bundleIdentifier ?? "com.app.auth",
+        subsystem: String = Bundle.main.bundleIdentifier ?? "com.netifyauth.authprovider",
         category: String = "TokenAuthProvider"
     ) {
         self.tokenManager = tokenManager
@@ -72,7 +72,7 @@ public final class TokenAuthProvider: AuthenticationProvider {
             // 인증 헤더 추가 (headers 프로퍼티 사용 가정)
             let headerValue = "\(tokenPrefix)\(accessToken)" // NetifyRequest는 headers 프로퍼티를 가짐
             mutableRequest.setValue(headerValue, forHTTPHeaderField: headerName) // 수정: URLRequest의 헤더 설정 메서드 사용
-
+            
             logger.debug("Added authentication header to request")
             return mutableRequest
         } catch {
@@ -117,7 +117,7 @@ public final class TokenAuthProvider: AuthenticationProvider {
     /// AuthenticationProvider 프로토콜 요구사항입니다.
     public nonisolated func isAuthenticationExpired(from error: Error) -> Bool {
         guard let networkError = error as? NetworkRequestError else { return false }
-
+        
         // Netify의 NetworkRequestError 케이스 확인
         switch networkError {
         case .unauthorized:
@@ -126,7 +126,7 @@ public final class TokenAuthProvider: AuthenticationProvider {
             // 403 Forbidden은 일반적으로 토큰 만료보다는 권한 부족을 의미하므로,
             // 기본적으로는 인증 만료로 간주하지 않아 갱신을 트리거하지 않음.
             return false
-        // .unauthorized 케이스가 401을 처리하므로 .clientError에서 401을 중복 확인할 필요는 없음
+            // .unauthorized 케이스가 401을 처리하므로 .clientError에서 401을 중복 확인할 필요는 없음
         default:
             return false
         }

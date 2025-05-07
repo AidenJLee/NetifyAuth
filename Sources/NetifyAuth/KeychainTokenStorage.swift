@@ -2,8 +2,8 @@
 import Foundation
 import Security
 
-/// 키체인을 사용한 토큰 저장소 구현
-public class KeychainTokenStorage: TokenStorage {
+/// 키체인을 사용한 토큰 저장소 구현 (Actor로 변경하여 동시성 안전 확보)
+public actor KeychainTokenStorage: TokenStorage {
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
     private let serviceName: String
@@ -14,7 +14,7 @@ public class KeychainTokenStorage: TokenStorage {
     ///   - serviceName: 키체인 서비스 이름 (기본값: 앱 번들 ID)
     ///   - accessibility: 키체인 접근성 설정
     public init(
-        serviceName: String = Bundle.main.bundleIdentifier ?? "com.app.tokenstore",
+        serviceName: String = Bundle.main.bundleIdentifier ?? "com.netifyauth.tokenstore",
         accessibility: CFString = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
     ) {
         self.serviceName = serviceName

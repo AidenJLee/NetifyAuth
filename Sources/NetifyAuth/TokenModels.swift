@@ -21,7 +21,7 @@ public protocol TokenStorage {
 }
 
 /// 토큰 갱신 API 응답 프로토콜
-public protocol TokenRefreshResponse {
+public protocol TokenRefreshResponse: Sendable {
     /// 새로 발급된 접근 토큰
     var accessToken: String { get }
     
@@ -36,7 +36,7 @@ public protocol TokenRefreshResponse {
 }
 
 /// 토큰 정보 구조체
-public struct TokenInfo: Codable, Equatable {
+public struct TokenInfo: Codable, Equatable, Sendable {
     /// 접근 토큰
     public let accessToken: String
     
@@ -98,9 +98,7 @@ public struct TokenInfo: Codable, Equatable {
         refreshTokenBuffer: TimeInterval = 0,
         now: Date = Date() // 기준 시간 주입 가능하도록 변경
     ) -> ValidityState {
-        // let now = Date() // BUG: 외부에서 주입된 now 값을 덮어쓰므로 제거
-        
-        // 접근 토큰 유효성 검사
+        // The internal `let now = Date()` was removed, so the parameter `now` is used.
         if accessTokenExpiresAt.addingTimeInterval(-accessTokenBuffer) > now {
             return .valid
         }
@@ -134,7 +132,7 @@ public enum TokenError: LocalizedError, Equatable {
     /// 토큰 갱신 실패
     case refreshFailed(description: String)
     /// 토큰 폐기 실패 (서버 통신 오류)
-    case revocationFailed(underlyingError: Error)
+    case revocationFailed(description: String)
     /// 잘못된 응답
     case invalidResponse(reason: String)
     /// 기타 오류
@@ -154,8 +152,8 @@ public enum TokenError: LocalizedError, Equatable {
             return "Cannot refresh: Refresh token is missing"
         case .refreshFailed(let description):
             return "Token refresh failed: \(description)"
-        case .revocationFailed(let underlyingError):
-            return "Token revocation failed: \(underlyingError.localizedDescription)"
+        case .revocationFailed(let description):
+            return "Token revocation failed: \(description)"
         case .invalidResponse(let reason):
             return "Invalid response: \(reason)"
         case .unknown(let message):
@@ -176,8 +174,7 @@ public enum TokenError: LocalizedError, Equatable {
         case (.refreshTokenMissing, .refreshTokenMissing):
             return true
         case (.refreshFailed, .refreshFailed): return true
-        // revocationFailed는 underlyingError 비교가 복잡하므로 케이스만 비교
-        case (.revocationFailed, .revocationFailed): return true
+        case (.revocationFailed, .revocationFailed): return true // Keep case-only comparison for simplicity
         case (.invalidResponse, .invalidResponse): return true
         case (.unknown, .unknown): return true
         default:

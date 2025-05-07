@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AidenJLee/Netify.git",
       "state" : {
-        "revision" : "6934b9413c76f68a88cc85742fe3bc2dd648a672",
-        "version" : "1.0.0"
+        "revision" : "d4342c7dcbb6d7ae6def595604cfc79082eebe75",
+        "version" : "1.0.1"
       }
     }
   ],
